@@ -1,8 +1,14 @@
-from flask import Flask, render_template_string
+import streamlit as st
 
-app = Flask(__name__)
+st.set_page_config(page_title="My App")
 
-# Simple HTML page
+st.title("Welcome to My Website")
+st.write("This webpage is made using Python")
+
+if st.button("Click Me"):
+    st.success("Hello Div!")
+
+
 html_page = """
 <!DOCTYPE html>
 <html>
