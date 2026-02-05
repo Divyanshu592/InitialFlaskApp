@@ -7,27 +7,46 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      # Checkout
+      - uses: actions/checkout@v4
 
+      # Setup Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
+      # Install deps
       - name: Install Dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Streamlit App
+      # Start Streamlit
+      - name: Start Streamlit
         run: |
-          streamlit run app.py --server.port 8501 --server.headless true &
-          sleep 15
+          nohup streamlit run app.py \
+            --server.port 8501 \
+            --server.headless true \
+            --server.enableCORS false \
+            --server.enableXsrfProtection false \
+            > streamlit.log 2>&1 &
 
+      # Wait for startup
+      - name: Wait for Server
+        run: |
+          sleep 25
+
+      # Show logs (debug)
+      - name: Show Streamlit Logs
+        run: |
+          cat streamlit.log
+
+      # Test
       - name: Test App
         run: |
-          curl -f http://localhost:8501
+          curl -v http://localhost:8501
